@@ -14,18 +14,18 @@ conn = sqlite3.connect(sqlite_file)
 def setup_table():
   c = conn.cursor()
   sql = """
-    CREATE TABLE time_log (
+    CREATE TABLE IF NOT EXISTS time_log (
       id INTEGER PRIMARY KEY,
       subject TEXT,
+      note TEXT,
       start_time TEXT,
-      end_time TEXT,
-      note TEXT
+      end_time TEXT
     )
   """
   c.execute(sql)
   conn.commit()
 
-def get_all_started_subjects():
+def get_all_unended_subjects():
   c = conn.cursor()
   # select rows with start_time != NULL & end_time = NULL  
   c.execute("SELECT * FROM {tn} WHERE {start_col} IS NOT NULL AND {end_col} IS NULL".\
@@ -52,39 +52,28 @@ def start_subject(subject, note=None):
   return c.fetchone()
 
 
-def end_subject(subject, note):
+def end_subject(row_number, note=None):
   c = conn.cursor()
-  # TODO: check there is exactly one unended subject
-
-  # update last row of subject with end_time "now"
-  sql = """
-    SELECT * FROM {tn}
-    WHERE {sub_col} = \"{sub}\"
-    AND {start_col} IS NOT NULL
-    AND {end_col} IS NULL
-    ORDER BY id 
-    DESC LIMIT 1
-  """.format(tn=table_name, sub_col=subject_col, sub=subject, start_col=start_time_col, end_col=end_time_col)
-  c.execute(sql)
-  open_subject = c.fetchall()
-  row_number = open_subject[0][0]
-
-  if len(open_subject) != 1:
-    print("More than one open subject")
+  if note is None:
+    c.execute("UPDATE {tn} SET {end_col}=(DATETIME(CURRENT_TIMESTAMP, 'LOCALTIME')) WHERE {i_col}={id}".\
+      format(tn=table_name, end_col=end_time_col, i_col=id_col, id=row_number))
   else:
-    if note is None:
-      c.execute("UPDATE {tn} SET {end_col}=(DATETIME(CURRENT_TIMESTAMP, 'LOCALTIME')) WHERE {i_col}={id}".\
-        format(tn=table_name, end_col=end_time_col, i_col=id_col, id=row_number))
-    else:
-      c.execute("UPDATE {tn} SET {end_col}=(DATETIME(CURRENT_TIMESTAMP, 'LOCALTIME')), {nt_col}=\"{nt}\" WHERE {i_col}={id}".\
-        format(tn=table_name, end_col=end_time_col, nt_col=note_col, nt=note, i_col=id_col, id=row_number))
-  conn.commit()
+    c.execute("UPDATE {tn} SET {end_col}=(DATETIME(CURRENT_TIMESTAMP, 'LOCALTIME')), {nt_col}=\"{nt}\" WHERE {i_col}={id}".\
+      format(tn=table_name, end_col=end_time_col, nt_col=note_col, nt=note, i_col=id_col, id=row_number))
 
+  conn.commit()
   # return the row of updated subject
-  c.execute("SELECT * FROM {tn} WHERE {sub_col} = \"{sub}\" ORDER BY id DESC LIMIT 1".\
-    format(tn=table_name, sub_col=subject_col, sub=subject))
+  c.execute("SELECT * FROM {tn} WHERE {i_col}={id} ORDER BY id DESC LIMIT 1".\
+    format(tn=table_name, i_col=id_col, id=row_number))
   return c.fetchone()
 
+
+def reset_database():
+  c = conn.cursor()
+  c.execute("DROP TABLE IF EXISTS {tn}".\
+    format(tn=table_name))
+  conn.commit()
+  setup_table()
 
 def validate_database():
   pass

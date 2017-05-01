@@ -1,18 +1,18 @@
 import database
 import sys
 
-def get_all_started_subjects():
-  all_subjects = database.get_all_started_subjects()
-  print(all_subjects)
+def get_all_unended_subjects():
+  unended_subjects = database.get_all_unended_subjects()
+  return unended_subjects
 
-def start_subject(subject, note):
+
+def start_subject(subject, note=None):
   subject = database.start_subject(subject, note)
-  print(subject)
+  return subject
   
-
-def end_subject(subject, note):
-  subject = database.end_subject(subject, note)
-  print(subject)
+def end_subject(id, note=None):
+  subject = database.end_subject(id, note)
+  return subject
 
 
 
@@ -23,5 +23,5 @@ if __name__ == '__main__':
   elif len(sys.argv) == 3:
     globals()[sys.argv[1]](sys.argv[2])
   elif len(sys.argv) == 4:
-    globals()[sys.argv[1]](sys.argv[2], sys.argv[3])
+    globals()[sys.argv[1]](sys.argv[2], sys.argv[3]) #function taking two arguements
 
