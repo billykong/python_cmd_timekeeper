@@ -3,4 +3,7 @@ python database.py reset_database
 python controller.py start_subject coding timekeeper
 python controller.py end_subject coding
 
-TODO: get all tasks of today
+TODO: 
+* get all tasks of today
+* unit tests; consider doctest, py.test
+

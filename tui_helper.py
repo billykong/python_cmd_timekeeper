@@ -8,8 +8,9 @@ def display_menu():
   menu = """
     Please choose one of the followings:
       1. Show all unended task
-      2. Start a task
-      3. End a task 
+      2. Show today's task
+      3. Start a task
+      4. End a task 
   """
   print(menu)
 
@@ -24,8 +25,10 @@ def process_menu_input(user_input):
   if user_input == 1:
     show_all_unended_tasks()
   elif user_input == 2:
-    start_a_task()
+    show_all_subjects_of_today()
   elif user_input == 3:
+    start_a_task()
+  elif user_input == 4:
     end_a_task()
   else:
     print(lang.unavailable)
@@ -36,6 +39,11 @@ def show_all_unended_tasks():
   # (13, 'quoted', 'None', '19:07:25', None)
   print(tabulate(unended_subjects, headers=["id", "subject", "desc", "start-time", "end-time"]))
   return unended_subjects
+
+def show_all_subjects_of_today():
+  today_subjects = controller.get_all_subjects_of_today()
+  print(tabulate(today_subjects, headers=["id", "subject", "desc", "start-time", "end-time"]))
+  return today_subjects
 
 def start_a_task():
   subject = input("Please enter task subject: ")

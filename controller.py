@@ -5,6 +5,9 @@ def get_all_unended_subjects():
   unended_subjects = database.get_all_unended_subjects()
   return unended_subjects
 
+def get_all_subjects_of_today():
+  today_subjects = database.get_all_subjects_of_today()
+  return today_subjects
 
 def start_subject(subject, note=None):
   subject = database.start_subject(subject, note)

@@ -32,6 +32,11 @@ def get_all_unended_subjects():
     format(tn=table_name, start_col=start_time_col, end_col=end_time_col))
   return c.fetchall()
 
+def get_all_subjects_of_today():
+  c = conn.cursor()
+  c.execute("SELECT * FROM {tn} WHERE strftime('%Y-%m-%d', {start_col}) = strftime('%Y-%m-%d', 'now')".\
+    format(tn=table_name, start_col=start_time_col))
+  return c.fetchall()
 
 def start_subject(subject, note=None):
   c = conn.cursor()
